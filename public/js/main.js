@@ -155,9 +155,88 @@ const hookTripsCatalog = async () => {
     }
 };
 
+const hookSchedulesCatalog = () => {
+    const monthSelect = document.getElementById('month');
+    const listEl = document.querySelector('.schedules-grid');
+    const templateEl = document.getElementById('schedule-card-template');
+
+    if (!monthSelect || !listEl || !templateEl) return;
+
+    // Fetch whenever the selected month changes
+    monthSelect.onchange = async function () {
+
+        const month = this.value;
+        const tripId = window.location.pathname.split('/').pop();
+
+        console.log('Month changed:', month);
+
+        if (!month) {
+            listEl.innerHTML = '<p>Please select a month.</p>';
+            return;
+        }
+
+        const url = `/api/trips/${tripId}/schedules?month=${month}`;
+
+        console.log('Fetching:', url);
+
+        try {
+            listEl.innerHTML = '<p>Loading schedules...</p>';
+
+            const response = await fetch(url);
+
+            if (!response.ok) {
+                throw new Error(`HTTP Error: ${response.status}`);
+            }
+
+            const payload = await response.json();
+
+            console.log('Received schedules:', payload);
+
+            const schedules = payload.data.schedules || [];
+            const fragment = document.createDocumentFragment();
+
+            if (schedules.length === 0) {
+                listEl.innerHTML = '<p>No schedules available.</p>';
+                return;
+            }
+
+            schedules.forEach(schedule => {
+                const card = templateEl.content.cloneNode(true);
+
+                card.querySelector('.depart-time').textContent = schedule.departureTime;
+                card.querySelector('.arrival-time').textContent = schedule.arrivalTime;
+
+                const daysContainer = card.querySelector('.schedule-days');
+
+                schedule.daysOfWeek.forEach(day => {
+                    const span = document.createElement('span');
+                    span.classList.add('day-badge');
+                    span.textContent = day.substring(0, 3);
+                    daysContainer.appendChild(span);
+                });
+
+                card.querySelector('.book-now').href =
+                    `/trips/booking/${schedule.id || schedule._id}`;
+
+                fragment.appendChild(card);
+            });
+
+            listEl.replaceChildren(fragment);
+
+        } catch (error) {
+            console.error('Schedule error:', error);
+            listEl.innerHTML = '<p>Unable to load schedules.</p>';
+        }
+    };
+};
+
 document.addEventListener('DOMContentLoaded', () => {
     hookRegionSorter();
     hookSeasonSorter();
     hookTrainsCatalog();
-    hookTripsCatalog()
+    hookTripsCatalog();
+    hookSchedulesCatalog()
+
+    
 });
+
