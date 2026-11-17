@@ -103,8 +103,20 @@ const hookTripsCatalog = async () => {
         }
 
         const payload = await response.json();
-        const trips = payload.trips || [];
+        let trips = payload.trips || [];
         const fragment = document.createDocumentFragment();
+
+        const params = new URLSearchParams(window.location.search);
+        const season = params.get('season');
+        const region = params.get('region');
+
+        if (season && season !== 'all') {
+            trips = trips.filter(trip => trip.bestSeason === season);
+        }
+
+        if (region && region !== 'all') {
+            trips = trips.filter(trip => trip.region === region);
+        }
 
         trips.forEach((trip) => {
             const card = templateEl.content.cloneNode(true);
