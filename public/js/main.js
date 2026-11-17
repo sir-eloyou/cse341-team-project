@@ -88,8 +88,64 @@ const hookTrainsCatalog = async () => {
     }
 };
 
+const hookTripsCatalog = async () => {
+    const listEl = document.querySelector('.routes-grid');
+    const templateEl = document.getElementById('trip-card-template');
+
+    if (!listEl || !templateEl) {
+        return;
+    }
+
+    try {
+        const response = await fetch('/api/trips');
+        if (!response.ok) {
+            throw new Error(`Failed to load trains (${response.status})`);
+        }
+
+        const payload = await response.json();
+        const trips = payload.trips || [];
+        const fragment = document.createDocumentFragment();
+
+        trips.forEach((trip) => {
+            const card = templateEl.content.cloneNode(true);
+            card.querySelector(".route-card").classList.add(trip.region)
+            card.querySelector(".route-name").textContent = trip.name
+            card.querySelector(".route-region").textContent = trip.region
+
+            card.querySelector(".start-station").textContent = trip.startStation
+            card.querySelector(".end-station").textContent = trip.endStation
+            card.querySelector(".trip-duration").textContent = `Duration: ${trip.duration}`
+            card.querySelector(".trip-distance").textContent = `Distance: ${trip.duration}`
+            card.querySelector(".trip-best-season").classList.add(`season-${trip.bestSeason}`)
+            card.querySelector(".trip-best-season").textContent = `Best in ${trip.bestSeason}`
+            card.querySelector(".route-description").textContent = trip.description
+
+            trip.highlights.forEach( highlight => {
+                const span = document.createElement("span")
+                span.classList.add("highlight-tag")
+                span.textContent = highlight
+
+                card.querySelector(".highlights-list").appendChild(span)
+            })
+
+            card.querySelector(".trip-link").href = `/trips/${trip.id}`
+
+         
+
+         
+            fragment.appendChild(card);
+        });
+
+        listEl.replaceChildren(fragment);
+       
+    } catch (error) {
+        console.log(error)
+    }
+};
+
 document.addEventListener('DOMContentLoaded', () => {
     hookRegionSorter();
     hookSeasonSorter();
     hookTrainsCatalog();
+    hookTripsCatalog()
 });
