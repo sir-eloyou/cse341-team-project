@@ -6,12 +6,13 @@ import globalMiddleware from './src/middleware/global.js';
 import routes from './src/routes/router.js';
 import swaggerUi from "swagger-ui-express";
 import swaggerSpec from './swagger.js';
+import cors from "cors";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = Path.dirname(__filename);
 
 const app = express();
-
+app.use(cors());
 // Add version info to res.locals for access in templates.
 app.use((req, res, next) => {
     res.locals.appVersion = pkg.version;
