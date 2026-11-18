@@ -1,6 +1,8 @@
 import express from "express"
 import { getAllTrips, getTripById } from "../controllers/trips.js"
 import { getSchedulesForTrip } from "../controllers/schedules.js";
+import { getAllBookings } from "../controllers/bookings.js";
+
 
 
 const router = express.Router()
@@ -132,5 +134,86 @@ router.get("/trips/:id", getTripById)
  */
 router.get("/trips/:id/schedules", getSchedulesForTrip);
 
+/**
+ * @swagger
+ * /api/bookings:
+ *   get:
+ *     summary: Get all bookings
+ *     description: Retrieve all bookings from the database.
+ *     tags:
+ *       - Bookings
+ *     responses:
+ *       200:
+ *         description: Bookings retrieved successfully or no bookings found.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Bookings retrieved successfully
+ *                 count:
+ *                   type: integer
+ *                   example: 2
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       _id:
+ *                         type: string
+ *                         example: 6afdab0aa8da61c0cfe319e5
+ *                       id:
+ *                         type: string
+ *                         example: JR2TLDB5V8
+ *                       scheduleId:
+ *                         type: string
+ *                         example: "2"
+ *                       tripId:
+ *                         type: string
+ *                         example: alpine-panorama
+ *                       ticketClass:
+ *                         type: string
+ *                         enum: [first, standard, premium]
+ *                         example: premium
+ *                       selectedDay:
+ *                         type: string
+ *                         example: monday
+ *                       passengers:
+ *                         type: array
+ *                         items:
+ *                           type: object
+ *                           properties:
+ *                             firstname:
+ *                               type: string
+ *                               example: John
+ *                             lastname:
+ *                               type: string
+ *                               example: Doe
+ *                             email:
+ *                               type: string
+ *                               example: john@gmail.com
+ *                             phone:
+ *                               type: string
+ *                               example: "09123456789"
+ *                       createdAt:
+ *                         type: string
+ *                         format: date-time
+ *                       updatedAt:
+ *                         type: string
+ *                         format: date-time
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Internal server error
+ */
+router.get("/bookings",getAllBookings)
 
 export default router
