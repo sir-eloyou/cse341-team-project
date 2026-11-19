@@ -1,8 +1,8 @@
 import { createBooking, getAllBookings as findAllBookings } from "../models/bookings.js";
-import { getSchedulesByTripId } from "../models/schedules.js";
 import { getTripById } from "../models/trips.js";
 import { generateConfirmationCode } from '../includes/helpers.js';
 import { getDb } from "../db/connect.js";
+import scheduleSchema from "../models/schemas/schedules.js";
 
 
 const getAllBookings = async (req, res) => {
@@ -50,7 +50,7 @@ const bookingPage = async (req, res) => {
     const { scheduleId } = req.params;
 
     const db = getDb()
-    const schedule = await db.collection("schedules").findOne({ id: Number(scheduleId)});
+    const schedule = await scheduleSchema.findOne({ id: Number(scheduleId)});
     const trip = await getTripById(schedule.tripId)
     const ticketClasses = await db.collection('ticketClasses').find({}).toArray();
     const ticketOptions = ticketClasses.map((ticketClass) => ({
