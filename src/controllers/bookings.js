@@ -3,37 +3,89 @@ import { getTripById } from "../models/trips.js";
 import { generateConfirmationCode } from '../includes/helpers.js';
 import { getDb } from "../db/connect.js";
 import scheduleSchema from "../models/schemas/schedules.js";
+import schedule from "../models/schemas/schedules.js";
 
+
+// const getAllBookings = async (req, res) => {
+
+//     try {
+
+//         const bookings = await findAllBookings();
+
+        
+
+//         if (bookings.length === 0) {
+//             return res.status(200).json({
+//                 message: "Theres no bookings",
+//                 counts: 0,
+//                 data: []
+//             })
+//         }
+
+//         bookings.schedule = await schedule.findOne({ id : Number(bookings.scheduleId)})
+
+       
+
+//         return res.status(200).json({
+//             message: "Bookings retrieved successfully",
+//             counts: bookings.length,
+//             data: bookings
+            
+//         })
+
+//     } catch(error) {
+//         console.error("Error getting all bookings", error.message)
+//         return res.status(500).json({
+//             message: "Internal server error"
+//         })
+
+//     }
+// }
 
 const getAllBookings = async (req, res) => {
-
     try {
-
         const bookings = await findAllBookings();
 
         if (bookings.length === 0) {
             return res.status(200).json({
-                message: "Theres no bookings",
+                message: "There's no bookings",
                 counts: 0,
                 data: []
-            })
+            });
         }
+
+        const bookingsWithScheduleAndTripDetails = await Promise.all(
+            bookings.map(async (booking) => {
+
+                const scheduleData = await schedule.findOne({
+                    id: Number(booking.scheduleId)
+                });
+
+                const tripData = await getTripById(booking.tripId)
+
+                return {
+                    ...booking,
+                    trip: tripData,
+                    schedule: scheduleData
+                };
+
+            })
+        );
 
         return res.status(200).json({
             message: "Bookings retrieved successfully",
-            counts: bookings.length,
-            data: bookings
-            
-        })
+            counts: bookingsWithScheduleAndTripDetails.length,
+            data: bookingsWithScheduleAndTripDetails
+        });
 
-    } catch(error) {
-        console.error("Error getting all bookings", error.message)
+    } catch (error) {
+        console.error("Error getting all bookings", error.message);
+
         return res.status(500).json({
             message: "Internal server error"
-        })
-
+        });
     }
-}
+};
 
 const processBookingRequest = async (req, res) => {
     const confirmation = {
