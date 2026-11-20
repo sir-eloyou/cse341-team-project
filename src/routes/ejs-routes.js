@@ -1,4 +1,4 @@
-import { bookingPage, processBookingRequest } from './book.js';
+import { bookingPage, processBookingRequest } from '../controllers/bookings.js';
 import confirmationPage from './confirm.js';
 import { detailsPageHandler, listPageHandler } from "../controllers/trips.js"
 import { Router } from 'express';

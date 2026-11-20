@@ -4,6 +4,7 @@ import { Router } from 'express';
 import { homePage, aboutPage, testErrorPage } from './index.js';
 import apiRoutes from './api-routes.js'
 import ejsRoutes from './ejs-routes.js'
+import { bookingAdminPage } from '../controllers/bookings.js';
 
 const router = Router();
 
@@ -26,5 +27,7 @@ router.use('/trips', ejsRoutes);
 router.get('/500', testErrorPage);
 
 router.use("/api", apiRoutes)
+
+router.get("/bookings-admin", bookingAdminPage )
 
 export default router;
