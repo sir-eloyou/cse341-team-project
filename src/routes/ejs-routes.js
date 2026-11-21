@@ -3,6 +3,7 @@ import confirmationPage from './confirm.js';
 import { detailsPageHandler, listPageHandler } from "../controllers/trips.js"
 import { Router } from 'express';
 
+
 const router = Router();
 
 // List all trips
