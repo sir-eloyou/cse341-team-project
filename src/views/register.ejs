@@ -1,0 +1,82 @@
+<%- include('./partials/header') %>
+
+    <div class="register-container">
+
+        <h2>Create Account</h2>
+        <p class="subtitle">Sign up to get started</p>
+
+        <% if (messages.error) { %>
+            <% messages.error.forEach(message => { %>
+                <div class="alert error">
+                    <%= message %>
+                </div>
+            <% }) %>
+        <% } %>
+
+        <% if (messages.success) { %>
+            <% messages.success.forEach(message => { %>
+                <div class="alert success">
+                    <%= message %>
+                </div>
+            <% }) %>
+        <% } %>
+
+        <form action="/register" method="POST">
+
+            <div class="form-group">
+                <label>Full Name</label>
+                <input
+                    type="text"
+                    name="name"
+                    placeholder="Enter your full name"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label>Email Address</label>
+                <input
+                    type="email"
+                    name="email"
+                    placeholder="Enter your email"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label>Password</label>
+                <input
+                    type="password"
+                    name="password"
+                    placeholder="Enter your password"
+                    minlength="8"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label>Confirm Password</label>
+                <input
+                    type="password"
+                    name="confirmPassword"
+                    placeholder="Confirm your password"
+                    minlength="8"
+                    required
+                >
+            </div>
+
+            <button type="submit">Create Account</button>
+
+        </form>
+
+        <p class="login-link">
+            Already have an account?
+            <a href="/login">Login</a>
+        </p>
+
+    </div>
+
+
+
+
+<%- include('./partials/footer') %>

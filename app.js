@@ -7,6 +7,11 @@ import routes from './src/routes/router.js';
 import swaggerUi from "swagger-ui-express";
 import swaggerSpec from './swagger.js';
 import cors from "cors";
+import session from "express-session";
+import flash from "express-flash";
+import { loadSessionUser } from './src/middleware/auth.js';
+
+const sessionSecret = process.env.SESSION_SECRET
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = Path.dirname(__filename);
@@ -24,10 +29,31 @@ app.use(express.static(Path.join(__dirname, 'public')));
 app.set('view engine', 'ejs');
 app.set('views', Path.join(__dirname, 'src/views'));
 
+// app.use(session({
+//     secret: sessionSecret,
+//     resave: false,
+//     saveUninitialized: false,
+//     cookie: { maxAge: 60 * 60 * 1000 } // Set to true if using HTTPS
+// }));
+app.use(session({
+    secret: process.env.SESSION_SECRET || 'your-secret-key',
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 1000 * 60 * 30
+    }
+}));
+
+app.use(loadSessionUser);
+
+app.use(flash());
+
 // Parse JSON and URL-encoded request bodies.
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
-
 
 
 app.use(globalMiddleware);
