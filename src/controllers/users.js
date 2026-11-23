@@ -109,9 +109,23 @@ const loginUser = async (req, res) => {
     }
 };
 
+const logoutUser = async (req, res) => {
+    req.session.destroy((err) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).json({
+                message: 'Error logging out'
+            });
+        }
+
+        res.clearCookie('connect.sid');
+        return res.redirect('/login');
+    });
+}
+
 const adminDashboardPage = async (req, res) => {
     res.render('admin-dashboard', {
         title: 'Admin Dashboard'
     });
 };
-export { registerUserPage, loginUserPage , registerUser, loginUser, adminDashboardPage};
+export { registerUserPage, loginUserPage , registerUser, loginUser, adminDashboardPage, logoutUser };

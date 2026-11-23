@@ -5,9 +5,9 @@ import { homePage, aboutPage, testErrorPage } from './index.js';
 import apiRoutes from './api-routes.js'
 import ejsRoutes from './ejs-routes.js'
 import { bookingAdminPage } from '../controllers/bookings.js';
-import { registerUserPage, loginUserPage, registerUser, loginUser } from '../controllers/users.js';
+import { registerUserPage, loginUserPage, registerUser, loginUser , logoutUser} from '../controllers/users.js';
 import { adminDashboardPage } from '../controllers/users.js';
-import {requirePageRole} from '../middleware/auth.js';
+import {requirePageRole , requirePageLogin} from '../middleware/auth.js';
 
 const router = Router();
 
@@ -39,5 +39,5 @@ router.post('/register', registerUser);
 router.get('/login', loginUserPage);
 router.post('/login', loginUser);
 router.get('/admin-dashboard', requirePageRole('admin'), adminDashboardPage);
-
+router.get('/logout', requirePageLogin, logoutUser);
 export default router;
