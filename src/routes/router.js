@@ -7,7 +7,7 @@ import ejsRoutes from './ejs-routes.js'
 import { bookingAdminPage } from '../controllers/bookings.js';
 import { registerUserPage, loginUserPage, registerUser, loginUser , logoutUser} from '../controllers/users.js';
 import { adminDashboardPage } from '../controllers/users.js';
-import {requirePageRole , requirePageLogin} from '../middleware/auth.js';
+import {requirePageRole , requirePageLogin, requireGuest} from '../middleware/auth.js';
 
 const router = Router();
 
@@ -36,7 +36,7 @@ router.get("/bookings-admin", bookingAdminPage )
 // User registration and login routes
 router.get('/register', registerUserPage);
 router.post('/register', registerUser);
-router.get('/login', loginUserPage);
+router.get('/login', requireGuest, loginUserPage);
 router.post('/login', loginUser);
 router.get('/admin-dashboard', requirePageRole('admin'), adminDashboardPage);
 router.get('/logout', requirePageLogin, logoutUser);

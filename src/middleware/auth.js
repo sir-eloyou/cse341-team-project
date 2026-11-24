@@ -32,7 +32,7 @@ export const requirePageLogin = (req, res, next) => {
 
         return res.redirect('/login');
     }
-
+    
     return next();
 };
 
@@ -66,6 +66,14 @@ export const requirePageRole = (role) => (req, res, next) => {
     if (!hasRole(req, role)) {
         req.flash('error', 'You do not have permission to access this page.');
 
+        return res.redirect('/');
+    }
+
+    return next();
+};
+
+export const requireGuest = (req, res, next) => {
+    if (isLoggedIn(req)) {
         return res.redirect('/');
     }
 
