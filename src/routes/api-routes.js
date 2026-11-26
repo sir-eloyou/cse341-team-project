@@ -2,6 +2,7 @@ import express from "express"
 import { getAllTrips, getTripById } from "../controllers/trips.js"
 import { getSchedulesForTrip } from "../controllers/schedules.js";
 import { getAllBookings } from "../controllers/bookings.js";
+import { getAllUserBookings } from "../controllers/users.js";
 
 
 
@@ -216,4 +217,5 @@ router.get("/trips/:id/schedules", getSchedulesForTrip);
  */
 router.get("/bookings",getAllBookings)
 
+router.get("/user-bookings", getAllUserBookings)
 export default router
