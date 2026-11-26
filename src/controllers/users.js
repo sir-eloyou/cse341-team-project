@@ -1,4 +1,7 @@
 import { createUser, findUserByEmail, verifyPassword } from '../models/users.js';
+import { getAllBookings } from '../models/bookings.js';
+import schedule from '../models/schemas/schedules.js';
+import { getTripById } from '../models/trips.js';
 
 
 const registerUserPage = async (req, res) => {
@@ -88,13 +91,25 @@ const loginUser = async (req, res) => {
             req.session.user = {
                 id: user._id.toString(),
                 name: user.name,
+                email: user.email,
                 role: user.role.name
             };
+
+        
+                
 
             return req.session.save((err) => {
                 if (err) {
                     console.error(err);
                     return res.redirect('/login');
+                }
+
+                if (user.role.name === 'admin') {
+                    return res.redirect('/admin-dashboard');
+                }
+
+                if (user.role.name === 'customer') {
+                    return res.redirect('/user-dashboard');
                 }
 
                 return res.redirect(redirectTo);
@@ -128,4 +143,63 @@ const adminDashboardPage = async (req, res) => {
         title: 'Admin Dashboard'
     });
 };
-export { registerUserPage, loginUserPage , registerUser, loginUser, adminDashboardPage, logoutUser };
+
+const userDashboardPage = async (req, res) => {
+    res.render('user-dashboard', {
+        title: 'User Dashboard',
+        user: req.session.user
+    });
+}
+
+const getAllUserBookings = async (req, res) => {
+    try {
+
+        const email = req.session.user.email;
+
+        const bookings = await getAllBookings();
+
+        const userBookings = bookings.filter(booking =>
+            booking.passengers.some(passenger => passenger.email === email)
+        );
+
+        if (userBookings.length === 0) {
+            return res.status(200).json({
+                message: "There's no bookings",
+                counts: 0,
+                data: []
+            });
+        }
+
+        const bookingsWithScheduleAndTripDetails = await Promise.all(
+            userBookings.map(async (booking) => {
+
+                const scheduleData = await schedule.findOne({
+                    id: Number(booking.scheduleId)
+                });
+
+                const tripData = await getTripById(booking.tripId)
+
+                return {
+                    ...booking,
+                    trip: tripData,
+                    schedule: scheduleData
+                };
+
+            })
+        );
+
+        return res.status(200).json({
+            message: "Bookings retrieved successfully",
+            counts: bookingsWithScheduleAndTripDetails.length,
+            data: bookingsWithScheduleAndTripDetails
+        });
+
+    } catch (error) {
+        console.error("Error getting all bookings", error.message);
+
+        return res.status(500).json({
+            message: "Internal server error"
+        });
+    }
+};
+export { registerUserPage, loginUserPage , registerUser, loginUser, adminDashboardPage, logoutUser, userDashboardPage, getAllUserBookings };
