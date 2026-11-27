@@ -17,6 +17,21 @@ const createUser = async (name, email, password) => {
   return user._id.toString();
 };
 
+const getAllUsers = async () => {
+  return User.find().select('-passwordHash').populate('role');
+};
+
+const getUserById = async (id) => {
+  return User.findById(id).select('-passwordHash').populate('role');
+};
+
+const updateUser = async (id, updateData) => {
+  return User.findByIdAndUpdate(id, updateData, { new: true, runValidators: true }).select('-passwordHash').populate('role');
+};
+
+const deleteUser = async (id) => {
+  return User.findByIdAndDelete(id);
+};
 const findUserByEmail = async (email) => {
   return User.findOne({ email }).populate('role');
 };
@@ -25,4 +40,4 @@ const verifyPassword = async (password, passwordHash) => {
   return await bcrypt.compare(password, passwordHash);
 };
 
-export { createUser, findUserByEmail, verifyPassword };
+export { createUser, findUserByEmail, verifyPassword, getAllUsers, getUserById, updateUser, deleteUser  }; 

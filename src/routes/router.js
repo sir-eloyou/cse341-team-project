@@ -6,7 +6,7 @@ import apiRoutes from './api-routes.js'
 import ejsRoutes from './ejs-routes.js'
 import { bookingAdminPage } from '../controllers/bookings.js';
 import { registerUserPage, loginUserPage, registerUser, loginUser , logoutUser} from '../controllers/users.js';
-import { adminDashboardPage, userDashboardPage } from '../controllers/users.js';
+import { adminDashboardPage, userDashboardPage, userAdminPage } from '../controllers/users.js';
 import {requirePageRole , requirePageLogin, requireGuest} from '../middleware/auth.js';
 
 const router = Router();
@@ -41,4 +41,5 @@ router.post('/login', loginUser);
 router.get('/admin-dashboard', requirePageRole('admin'), adminDashboardPage);
 router.get('/logout', requirePageLogin, logoutUser);
 router.get('/user-dashboard', requirePageLogin, userDashboardPage);
+router.get('/user-admin', requirePageLogin, userAdminPage);
 export default router;

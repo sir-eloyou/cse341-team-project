@@ -2,7 +2,8 @@ import express from "express"
 import { getAllTrips, getTripById } from "../controllers/trips.js"
 import { getSchedulesForTrip } from "../controllers/schedules.js";
 import { getAllBookings } from "../controllers/bookings.js";
-import { getAllUserBookings } from "../controllers/users.js";
+import { getAllUserBookings , getAllUsersHandler, getUserByIdHandler, deleteUserHandler, updateUserHandler} from "../controllers/users.js";
+import {requireApiLogin} from '../middleware/auth.js';
 
 
 
@@ -218,4 +219,124 @@ router.get("/trips/:id/schedules", getSchedulesForTrip);
 router.get("/bookings",getAllBookings)
 
 router.get("/user-bookings", getAllUserBookings)
+
+
+
+
+/**
+ * @swagger
+ * /api/users:
+ *   get:
+ *     summary: Get all users
+ *     description: Retrieve all registered users.
+ *     tags:
+ *       - Users
+ *     responses:
+ *       200:
+ *         description: Users retrieved successfully
+ *       500:
+ *         description: Internal server error
+ */
+
+/**
+ * @swagger
+ * /api/users/{id}:
+ *   get:
+ *     summary: Get user by ID
+ *     description: Retrieve a specific user by their MongoDB ID.
+ *     tags:
+ *       - Users
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: MongoDB user ID
+ *     responses:
+ *       200:
+ *         description: User retrieved successfully
+ *       404:
+ *         description: User not found
+ *       500:
+ *         description: Internal server error
+ *
+ *   put:
+ *     summary: Update user
+ *     description: |
+ *       Update a user's information.
+ *       Regular users can update their own information.
+ *       Admin users can update any user.
+ *     tags:
+ *       - Users
+ *     security:
+ *       - cookieAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: MongoDB user ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 example: John Doe
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 example: john@gmail.com
+ *     responses:
+ *       200:
+ *         description: User updated successfully
+ *       400:
+ *         description: Invalid request data
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: You cannot update another user's information
+ *       404:
+ *         description: User not found
+ *       500:
+ *         description: Internal server error
+ *
+ *   delete:
+ *     summary: Delete user
+ *     description: |
+ *       Delete a user account.
+ *       Regular users can delete their own account.
+ *       Admin users can delete any user.
+ *     tags:
+ *       - Users
+ *     security:
+ *       - cookieAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: MongoDB user ID
+ *     responses:
+ *       200:
+ *         description: User deleted successfully
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: You cannot delete another user's account
+ *       404:
+ *         description: User not found
+ *       500:
+ *         description: Internal server error
+ */
+router.get("/users", getAllUsersHandler)
+router.get("/users/:id", getUserByIdHandler)
+router.put("/users/:id", updateUserHandler)
+router.delete("/users/:id" , requireApiLogin, deleteUserHandler)
 export default router
