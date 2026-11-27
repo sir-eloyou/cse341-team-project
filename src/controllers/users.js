@@ -1,4 +1,4 @@
-import { createUser, findUserByEmail, verifyPassword } from '../models/users.js';
+import { createUser, findUserByEmail, verifyPassword , getAllUsers, getUserById, deleteUser, updateUser} from '../models/users.js';
 import { getAllBookings } from '../models/bookings.js';
 import schedule from '../models/schemas/schedules.js';
 import { getTripById } from '../models/trips.js';
@@ -144,6 +144,12 @@ const adminDashboardPage = async (req, res) => {
     });
 };
 
+const userAdminPage = async (req, res) => {
+    res.render('user-admin', {
+        title: 'User Administration',
+        user : req.session.user
+    });
+};
 const userDashboardPage = async (req, res) => {
     res.render('user-dashboard', {
         title: 'User Dashboard',
@@ -202,4 +208,106 @@ const getAllUserBookings = async (req, res) => {
         });
     }
 };
-export { registerUserPage, loginUserPage , registerUser, loginUser, adminDashboardPage, logoutUser, userDashboardPage, getAllUserBookings };
+
+const getAllUsersHandler = async (req, res) => {
+    try {
+        const users = await getAllUsers();
+        return res.status(200).json({
+            message: "Users retrieved successfully",
+            counts: users.length,
+            data: users
+        });
+    } catch (error) {
+        console.error("Error getting all users", error.message);
+        return res.status(500).json({
+            message: "Internal server error"
+        });
+    }
+};
+
+const deleteUserHandler = async (req, res) => {
+    try {
+        
+        const loggedInUserId = req.session.user.id;
+        const loggedInUserRole = req.session.user.role;
+
+        const userId = req.params.id;
+
+        if (
+            loggedInUserRole !== 'admin' &&
+            loggedInUserId !== userId
+        ) {
+            return res.status(403).json({
+                message: 'You are not authorized to delete this user'
+            });
+        }
+
+        const deletedUser = await deleteUser(userId);
+
+        if (!deletedUser) {
+            return res.status(404).json({
+                message: "User not found"
+            });
+        }
+
+        return res.status(200).json({
+            message: "User deleted successfully",
+            data: deletedUser
+        });
+    } catch (error) {
+        console.error("Error deleting user", error.message);
+        return res.status(500).json({
+            message: "Internal server error"
+        });
+    }
+}
+
+const updateUserHandler = async (req, res) => {
+    try {
+        const userId = req.params.id;
+        const { name, email, role } = req.body;
+
+        const updatedUser = await updateUser(userId, { name, email, role });
+
+        if (!updatedUser) {
+            return res.status(404).json({
+                message: "User not found"
+            });
+        }
+
+        return res.status(200).json({
+            message: "User updated successfully",
+            data: updatedUser
+        });
+    } catch (error) {
+        console.error("Error updating user", error.message);
+        return res.status(500).json({
+            message: "Internal server error"
+        });
+    }   
+}
+
+const getUserByIdHandler = async (req, res) => {
+    try {
+        const userId = req.params.id;
+        const user = await getUserById(userId);
+
+        if (!user) {
+            return res.status(404).json({
+                message: "User not found"
+            });
+        }
+
+        return res.status(200).json({
+            message: "User retrieved successfully",
+            data: user
+        });
+    } catch (error) {
+        console.error("Error getting user by ID", error.message);
+        return res.status(500).json({
+            message: "Internal server error"
+        });
+    }
+}
+
+export { registerUserPage, loginUserPage , registerUser, loginUser, adminDashboardPage, logoutUser, userDashboardPage, userAdminPage, getAllUserBookings, getAllUsersHandler, deleteUserHandler, updateUserHandler, getUserByIdHandler };
